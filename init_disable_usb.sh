@@ -1,0 +1,14 @@
+[Unit]
+Description=Init LED user settings
+#After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/init_leds.sh
+RemainAfterExit=true
+ExecStop=/opt/init_leds_teardown.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
+

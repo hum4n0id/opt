@@ -1,0 +1,14 @@
+[Unit]
+Description=Init ISP for V4L2
+#After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/init_v4l2_isp.sh
+RemainAfterExit=true
+ExecStop=/opt/init_v4l2_isp_teardown.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
+

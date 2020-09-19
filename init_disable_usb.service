@@ -1,0 +1,14 @@
+[Unit]
+Description=Disable USB ports
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/init_disable_usb.sh
+RemainAfterExit=true
+ExecStop=/opt/init_disable_usb_teardown.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
+

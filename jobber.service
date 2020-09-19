@@ -1,0 +1,13 @@
+[Unit]
+Description=Start Jobber
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/jobbermaster
+StandardOutput=journal
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
