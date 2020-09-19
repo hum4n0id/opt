@@ -1,14 +1,12 @@
-[Unit]
-Description=Init LED user settings
-#After=network.target
+#!/bin/bash
+echo "Unmounting USB Drives"
+udisksctl power-off --block-device /dev/sda
+touch /tmp/usb_drives_off
 
-[Service]
-Type=oneshot
-ExecStart=/opt/init_leds.sh
-RemainAfterExit=true
-ExecStop=/opt/init_leds_teardown.sh
-StandardOutput=journal
+echo "Disabling Usb 1_1"
+uhubctl -l 1-1 -a off
+touch /tmp/usb_1_1_off
 
-[Install]
-WantedBy=multi-user.target
-
+echo "Disabling Usb 2"
+uhubctl -l 2 -a off
+touch /tmp/usb_2_off
