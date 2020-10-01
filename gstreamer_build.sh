@@ -6,7 +6,7 @@ set -e
 export MAKEFLAGS="-j 6"
 # use latest gstreamer stable build
 export BRANCH="1.18"
-# setup env
+#setup env
 export LIBRARY_PATH=/usr/lib:/opt/vc/lib
 export LD_LIBRARY_PATH=/usr/lib:/opt/vc/lib
 export C_INCLUDE_PATH=/usr/include:/opt/vc/include
@@ -19,7 +19,10 @@ export LDFLAGS='-L/usr/lib -L/opt/vc/lib' \
 CFLAGS='-I/usr/include -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux' \
 CPPFLAGS='-I/usr/include -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux -I/usr/include/python3.7m'
 
+echo "### starting gstreamer build ###"
 # hold some pkgs
+echo
+echo "### updating apt-cache and holding pkgs ###"
 apt-cache dumpavail | dpkg --merge-avail
 echo "libegl-dev hold" | dpkg --set-selections
 echo "libegl-mesa0  hold" | dpkg --set-selections
@@ -33,6 +36,8 @@ echo "libgles2-mesa-dev hold" | dpkg --set-selections
 # echo "libgstreamer-plugins-base1.0-0 hold" | sude dpkg --set-setlections
 
 # install base reqs + add’l packages
+echo && echo
+echo "### updating apt and installing deps ###"
 apt-get update
 apt-get install --no-install-recommends -y \
 screen build-essential autotools-dev automake autoconf checkinstall \
@@ -96,17 +101,19 @@ libassimp-dev libcamel1.2-dev libgmerlin-dev python3-cairo-dev libneon27-dev
 # remove brcm lib conflicts
 apt-get remove -y libgles2 libgles2-mesa-dev libegl-dev libegl1-mesa libegl1-mesa-dev libgles-dev
 
+echo && echo
+echo "### installing pip tools and deps ###"
 # pip install tools, libs
-pip3 install meson
-pip3 install ninja
-pip3 install pycairo
+pip3 install meson || true
+pip3 install ninja || true
+pip3 install pycairo || true
 # pip3 install PyGObject
 
 echo && echo
 echo "### fetching wayland src ###"
 # install wayland libs
 cd /opt
-git clone https://gitlab.freedesktop.org/wayland/wayland.git
+git clone https://gitlab.freedesktop.org/wayland/wayland.git || true
 cd wayland
 ./autogen.sh --prefix=/usr --disable-documentation
 make
@@ -115,9 +122,9 @@ mkdir -p /usr/share/aclocal
 
 echo && echo
 echo "### fetching srt src ###"
-# install srt libs
+# # install srt libs
 cd /opt
-git clone https://github.com/Haivision/srt
+git clone https://github.com/Haivision/srt || true
 cd srt
 ./configure --cmake-install-prefix=/usr
 make
@@ -128,7 +135,7 @@ echo "### fetching ffmpeg src ###"
 # install ffmpeg src (faster than using gst-build)
 # libs for gst-libav
 cd /opt
-git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
+git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg || true
 ln -s /opt/ffmpeg/lib* /usr/include/
 ln -s /opt/ffmpeg/lib* /usr/lib
 cd ..
@@ -137,30 +144,30 @@ echo && echo
 echo "### linking libs ###"
 # library and headers #
 # recreate classic libs, now brcm*
-ln -s /opt/vc/lib/* /usr/lib/
-ln -s /opt/vc/lib/libbrcmGLESv2.so /usr/lib/libGLESv2.so
-ln -s /opt/vc/lib/libbrcmEGL.so /usr/lib/libEGL.so
+ln -s /opt/vc/lib/* /usr/lib/ || true
+ln -s /opt/vc/lib/libbrcmGLESv2.so /usr/lib/libGLESv2.so || true
+ln -s /opt/vc/lib/libbrcmEGL.so /usr/lib/libEGL.so || true
 # & pkgconfig files
-ln -s /opt/vc/lib/pkgconfig/* /usr/lib/pkgconfig/
-ln -s /opt/vc/lib/pkgconfig/brcmglesv2.pc /usr/lib/pkgconfig/glesv2.pc
-ln -s /opt/vc/lib/pkgconfig/brcmegl.pc /usr/lib/pkgconfig/egl.pc
-ln -s /opt/vc/lib/pkgconfig/brcmglesv2.pc /opt/vc/lib/pkgconfig/glesv2.pc
-ln -s /opt/vc/lib/pkgconfig/brcmegl.pc /opt/vc/lib/pkgconfig/egl.pc
+ln -s /opt/vc/lib/pkgconfig/* /usr/lib/pkgconfig/ || true
+ln -s /opt/vc/lib/pkgconfig/brcmglesv2.pc /usr/lib/pkgconfig/glesv2.pc || true
+ln -s /opt/vc/lib/pkgconfig/brcmegl.pc /usr/lib/pkgconfig/egl.pc || true
+ln -s /opt/vc/lib/pkgconfig/brcmglesv2.pc /opt/vc/lib/pkgconfig/glesv2.pc || true
+ln -s /opt/vc/lib/pkgconfig/brcmegl.pc /opt/vc/lib/pkgconfig/egl.pc || true
 # other libs, pccd gs
-ln -s /opt/srt/lib* /usr/lib/
-ln -s /opt/srt/*.pc /usr/lib/pkgconfig/
-ln -s /opt/srt/srt-* /usr/include/
+ln -s /opt/srt/lib* /usr/lib/ || true
+ln -s /opt/srt/*.pc /usr/lib/pkgconfig/ || true
+ln -s /opt/srt/srt-* /usr/include/ || true
 # symlink headers
-ln -s /opt/vc/include/IL/* /usr/include/
-ln -s /opt/vc/include/IL/ /usr/include/IL
-ln -s /opt/vc/include/EGL/ /usr/include/EGL
-ln -s /opt/vc/include/GLES/ /usr/include/GLES
-ln -s /opt/vc/include/GLES2/ /usr/include/GLES2
-ln -s /opt/vc/include/KHR/ /usr/include/KHR
-ln -s /opt/vc/include/VG/ /usr/include/VG
-ln -s /opt/vc/include/WF/ /usr/include/WF
-ln -s /opt/vc/include/interface/ /usr/include/interface
-ln -s /opt/vc/include/vcinclude/ /usr/include/vcinclude
+ln -s /opt/vc/include/IL/* /usr/include/ || true
+ln -s /opt/vc/include/IL/ /usr/include/IL || true
+ln -s /opt/vc/include/EGL/ /usr/include/EGL || true
+ln -s /opt/vc/include/GLES/ /usr/include/GLES || true
+ln -s /opt/vc/include/GLES2/ /usr/include/GLES2 || true
+ln -s /opt/vc/include/KHR/ /usr/include/KHR || true
+ln -s /opt/vc/include/VG/ /usr/include/VG || true
+ln -s /opt/vc/include/WF/ /usr/include/WF || true
+ln -s /opt/vc/include/interface/ /usr/include/interface || true
+ln -s /opt/vc/include/vcinclude/ /usr/include/vcinclude || true
 # ldconfig
 ldconfig
 
@@ -168,7 +175,7 @@ echo && echo
 echo "### fetching gst-build src ###"
 # get src
 cd /opt
-git clone https://gitlab.freedesktop.org/gstreamer/gst-build
+git clone https://gitlab.freedesktop.org/gstreamer/gst-build || true
 cd gst-build
 git checkout origin/$BRANCH
 # prefetching / or for build modifications (needed for FFMpeg patch)
@@ -182,9 +189,11 @@ mv /opt/gst-build/subprojects/gstreamer-vaapi.wrap /opt/gst-build/subprojects/wi
 echo && echo
 echo "### fetching *subproject src ###"
 meson subprojects download
-# meson subprojects update
+# patch srt plugin
+sed -ie '/{"SRTO_LINGER", SRTO_LINGER, 0},/d' /opt/gst-build/subprojects/gst-plugins-bad/ext/srt/gstsrtobject.c
+# fetch tinyalsa
 cd subprojects
-git clone https://github.com/tinyalsa/tinyalsa.git
+git clone https://github.com/tinyalsa/tinyalsa.git || true
 
 # *installed build
 echo && echo
@@ -221,6 +230,6 @@ echo 'include /usr/lib' | tee -a /etc/ld.so.conf.d/usrlocal.conf
 echo 'include /usr/lib/arm-linux-gnueabihf' | tee -a /etc/ld.so.conf.d/usrlocal.conf
 ldconfig
 
-echo && echo
+echo
 echo "END"
 exit
