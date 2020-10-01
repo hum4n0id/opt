@@ -6,7 +6,7 @@ set -e
 export MAKEFLAGS="-j 6"
 # use latest gstreamer stable build
 export BRANCH="1.18"
-#setup env
+# setup env
 export LIBRARY_PATH=/usr/lib:/opt/vc/lib
 export LD_LIBRARY_PATH=/usr/lib:/opt/vc/lib
 export C_INCLUDE_PATH=/usr/include:/opt/vc/include
