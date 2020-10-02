@@ -230,6 +230,11 @@ echo 'include /usr/lib' | tee -a /etc/ld.so.conf.d/usrlocal.conf
 echo 'include /usr/lib/arm-linux-gnueabihf' | tee -a /etc/ld.so.conf.d/usrlocal.conf
 ldconfig
 
+echo "export LIBRARY_PATH=/usr/lib:/opt/vc/lib" >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=/usr/lib:/opt/vc/lib" >> ~/.bashrc
+echo "export PATH=/usr:/usr/include:/usr/lib:/usr/bin:$PATH" >> ~/.bashrc
+source ~/.bashrc
+
 echo
 echo "END"
 exit
